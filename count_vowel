@@ -1,0 +1,22 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func countvowel(s string) int {
+	count := 0
+	vowel := "aeiouAEIOU"
+	for _, v := range s {
+		if strings.ContainsRune(vowel, v) {
+
+			count++
+
+		}
+	}
+	return count
+}
+func main() {
+	fmt.Println(countvowel("gooeiuad")) // 6
+}
