@@ -1,0 +1,79 @@
+package main
+
+import "fmt"
+	
+
+func help(){
+	fmt.Println("take two integers,indicate operator needed to run the program")
+	fmt.Println("---help---")
+}
+
+func main() {
+	for {
+		var a, b int
+		var operator string
+		fmt.Println("Enter the first number:")
+		_, err := fmt.Scanln(&a)
+		if err != nil{
+			fmt.Println("input digit")
+			continue
+		}
+		fmt.Println("Enter operator (+,-,/,*,):")
+		fmt.Scanln(&operator)
+
+		fmt.Println("Enter the second number:")
+		_, err := fmt.Scanln(&b)
+		if err != nil{
+			fmt.Println("input digit")
+			continue
+		}
+		switch operator {
+		case "+":
+			fmt.Println(a, "+", b, "=", a+b)
+		case "-":
+			fmt.Println(a, "-", b, "=", a-b)
+		case "*":
+			fmt.Println(a, "*", b, "=", a*b)
+
+		case "/":
+			if b != 0 {
+				fmt.Println(a, "/", b, "=", a/b)
+			} else {
+				fmt.Println("Error: not divisible")
+			}
+		case "help":
+			help()
+			continue
+
+		case "q":
+			fmt.Println("Goodbye")
+			return
+		default:
+		fmt.Printf("%q is an invalid operator: \n",operator)
+
+		var response string
+		fmt.Println("do you want to continue,(yes/no):")
+		fmt.Scanln(&response)
+		if response != "yes"{
+			fmt.Println("Rest, continue next time")
+		} else{
+			fmt.Println("invalid input")
+		}
+			}
+			
+		}
+		
+		
+		}
+			
+		
+			
+		
+		
+
+
+	
+
+	
+
+
