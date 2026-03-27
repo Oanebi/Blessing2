@@ -1,0 +1,62 @@
+package main
+
+import "fmt"
+	
+
+func help(){
+	fmt.Println("take two integers,indicate operator needed to run the program")
+	fmt.Println("---help---")
+}
+
+func main() {
+	for {
+		var a, b int
+		var operator string
+		fmt.Println("Enter the first number:")
+		fmt.Scanln(&a)	
+		fmt.Println("Enter the second number:")
+		fmt.Scanln(&b)
+
+		fmt.Println("Enter operator (+,-,/,*,):")
+		fmt.Scanln(&operator)
+
+		switch operator {
+		case "+":
+			fmt.Println(a, "+", b, "=", a+b)
+		case "-":
+			fmt.Println(a, "-", b, "=", a-b)
+		case "*":
+			fmt.Println(a, "*", b, "=", a*b)
+		case "help":
+			help()
+			continue
+
+		case "/":
+			if b != 0 {
+				fmt.Println(a, "/", b, "=", a/b)
+			} else {
+				fmt.Println("Error: not divisible")
+			}
+
+		var response string
+		fmt.Println("do you want to continue,(yes/no):")
+		fmt.Scanln(&response)
+		if response != "yes"{
+			fmt.Println("Rest, continue next time")
+		} 
+		default:
+			fmt.Println("invalid")
+
+		}
+			}
+		}
+			
+		
+		
+
+
+	
+
+	
+
+
