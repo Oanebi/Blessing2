@@ -1,0 +1,88 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+func hexToDec(hex string) (int64, error) {
+	return strconv.ParseInt(hex, 16, 64)
+}
+
+func binToDec(bin string) (int64, error) {
+	return strconv.ParseInt(bin, 2, 64)
+}
+
+func decToBin(dec int64) string {
+	return strconv.FormatInt(dec, 2)
+}
+
+func decToHex(dec int64) string {
+	return strings.ToUpper(strconv.FormatInt(dec, 16))
+}
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Print("\n> convert (or type quit): ")
+
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimSpace(input)
+
+		if input == "" {
+			fmt.Println("Empty input")
+			continue
+		}
+
+		if input == "quit" {
+			fmt.Println("Goodbye 👋")
+			break
+		}
+
+		parts := strings.Fields(input)
+
+		if len(parts) != 2 {
+			fmt.Println("Invalid format. Example: convert 1E hex")
+			continue
+		}
+
+		value := parts[0]
+		base := strings.ToLower(parts[1])
+
+		switch base {
+
+		case "hex":
+			dec, err := hexToDec(value)
+			if err != nil {
+				fmt.Println("Invalid hex number")
+				continue
+			}
+			fmt.Printf("✦ Decimal: %d\n", dec)
+
+		case "bin":
+			dec, err := binToDec(value)
+			if err != nil {
+				fmt.Println("Invalid binary number")
+				continue
+			}
+			fmt.Printf("✦ Decimal: %d\n", dec)
+
+		case "dec":
+			dec, err := strconv.ParseInt(value, 10, 64)
+			if err != nil {
+				fmt.Println("Invalid decimal number")
+				continue
+			}
+
+			fmt.Printf("✦ Binary: %s\n", decToBin(dec))
+			fmt.Printf("✦ Hex: %s\n", decToHex(dec))
+
+		default:
+			fmt.Println("Unknown base. Use hex, bin, or dec")
+		}
+	}
+}
