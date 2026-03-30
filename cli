@@ -1,0 +1,82 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+)
+
+func help() {
+	fmt.Println("Simple Calculator Help")
+	fmt.Println("Enter operator first, then two integers separated by space")
+	fmt.Println("Example:")
+	fmt.Println("+")
+	fmt.Println("5 10")
+	fmt.Println("Available operators: +  -  *  /")
+	fmt.Println("Type 'q' to quit")
+	fmt.Println("---help---")
+}
+
+func main() {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		var a, b int
+		var operator string
+
+		fmt.Println("Enter operator (+,-,/,*,help,q):")
+		input, _ := reader.ReadString('\n')
+		fmt.Sscan(input, &operator)
+
+		switch operator {
+
+		case "help":
+			help()
+			continue
+
+		case "q":
+			fmt.Println("Goodbye")
+			return
+		}
+
+		fmt.Println("Enter two numbers (e.g. 5 10):")
+		input, _ = reader.ReadString('\n')
+		_, err := fmt.Sscan(input, &a, &b)
+		if err != nil {
+			fmt.Println("input digits separated by space")
+			continue
+		}
+
+		switch operator {
+
+		case "+":
+			fmt.Println(a, "+", b, "=", a+b)
+
+		case "-":
+			fmt.Println(a, "-", b, "=", a-b)
+
+		case "*":
+			fmt.Println(a, "*", b, "=", a*b)
+
+		case "/":
+			if b != 0 {
+				fmt.Println(a, "/", b, "=", a/b)
+			} else {
+				fmt.Println("Error: division by zero")
+			}
+
+		default:
+			fmt.Printf("%q is an invalid operator\n", operator)
+
+			var response string
+			fmt.Println("Do you want to continue (yes/no):")
+			input, _ = reader.ReadString('\n')
+			fmt.Sscan(input, &response)
+
+			if response != "yes" {
+				fmt.Println("Rest, continue next time")
+				return
+			}
+		}
+	}
+}
