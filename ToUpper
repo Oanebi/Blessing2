@@ -1,0 +1,28 @@
+
+package main
+
+import (
+	"fmt"
+	"strings"
+)
+
+func ToUpperLastWord(words []string) []string {
+	var result []string
+
+	for i := 0; i < len(words); i++ {
+		if words[i] == "up" {
+			if len(result) > 0 {
+				lastIdx := len(result) - 1
+				result[lastIdx] = strings.ToUpper(result[lastIdx])
+			}
+		} else {
+			result = append(result, words[i])
+		}
+	}
+
+	return result
+}
+func main() {
+	test1 := []string{"how", "are", "you", "cap"}
+	fmt.Println(ToUpperLastWord(test1))
+}
