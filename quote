@@ -1,0 +1,29 @@
+package main
+
+import (
+	"fmt"
+	"regexp"
+	"strings"
+)
+
+func punc(s string) string {
+	p1 := regexp.MustCompile(`\s*([?,.:;!]+)\s*`)
+	s = p1.ReplaceAllString(s, "$1 ")
+
+	return s
+}
+
+func quote(text string) string {
+
+	words := strings.Split(text, "'")
+	for b := 0; b < len(words); b++ {
+		if b%2 == 1 {
+			words[b] = strings.TrimSpace(words[b])
+		}
+	}
+	return strings.Join(words, "'")
+}
+
+func main() {
+	fmt.Println(quote(punc("I was sitting over there  ,  '   BAMM '   !!")))
+}
