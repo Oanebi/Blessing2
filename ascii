@@ -1,0 +1,75 @@
+package main
+
+import (
+	"fmt"
+	"os"
+	"strings"
+)
+
+// loadBanner reads the banner file and returns a map of rune -> 8 lines of ascii art
+func loadBanner(filename string) (map[rune][]string, error) {
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	// Normalize line endings
+	content := strings.ReplaceAll(string(data), "\r\n", "\n")
+	lines := strings.Split(content, "\n")
+
+	banner := make(map[rune][]string)
+
+	// Banner starts at ASCII 32 (space)
+	// Each character block = 1 empty separator line + 8 art lines = 9 lines
+	charCode := rune(32)
+	for i := 0; i+8 < len(lines); i += 9 {
+		banner[charCode] = lines[i+1 : i+9]
+		charCode++
+	}
+
+	return banner, nil
+}
+
+// printAscii looks up each character in the map and prints row by row
+func printAscii(input string, banner map[rune][]string) {
+	// Split on literal \n from the argument
+	lines := strings.Split(input, "\\n")
+
+	for _, line := range lines {
+		if line == "" {
+			fmt.Println()
+			continue
+		}
+		// Print all 8 rows for this line of text
+		for row := 0; row < 8; row++ {
+			for _, ch := range line {
+				if artLines, ok := banner[ch]; ok {
+					fmt.Print(artLines[row])
+				}
+			}
+			fmt.Println()
+		}
+	}
+}
+func main() {
+	// We expect: go run . [text] [banner]
+	if len(os.Args) != 3 {
+		fmt.Println("Usage: go run . <string> <banner>")
+		fmt.Println("Example: go run . \"hello\" shadow")
+		return
+	}
+
+	text := os.Args[1]
+	bannerName := os.Args[2]
+
+	// Construct filename (e.g., "shadow" becomes "shadow.txt")
+	filename := bannerName + ".txt"
+
+	banner, err := loadBanner(filename)
+	if err != nil {
+		fmt.Printf("Error: Could not find or read banner file '%s'\n", filename)
+		return
+	}
+
+	printAscii(text, banner)
+}
