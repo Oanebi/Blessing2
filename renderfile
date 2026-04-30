@@ -1,0 +1,25 @@
+package main
+
+import (
+	"strings"
+)
+
+func RenderLine(input string, banner map[rune][]string) []string {
+	lines := strings.Split(input, "\\n")
+	var result []string
+
+	for _, line := range lines {
+		if line == "" {
+			result = append(result, "")
+			continue
+		}
+		for row := 0; row < 8; row++ {
+			var sb strings.Builder
+			for _, ch := range line {
+				sb.WriteString(banner[ch][row])
+			}
+			result = append(result, sb.String())
+		}
+	}
+	return result
+}
