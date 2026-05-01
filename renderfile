@@ -20,6 +20,7 @@ func RenderLine(input string, banner map[rune][]string) []string {
 			}
 			result = append(result, sb.String())
 		}
-	}
+		}
+	
 	return result
 }
