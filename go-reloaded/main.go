@@ -1,31 +1,35 @@
 package main
+
 import (
-	"fmt"
-	"os"
 	"bufio"
+	"fmt"
+	"go-reloaded/processor"
+	"os"
 )
-func main(){
-	if len(os.Args) != 3{
+
+func main() {
+	if len(os.Args) != 3 {
 		fmt.Println("go run . input.txt output.txt")
 	}
 	inputpath := os.Args[1]
 	outputpath := os.Args[2]
-	inputfile,err := os.Open(inputpath)
-	if err != nil{
+	inputfile, err := os.Open(inputpath)
+	if err != nil {
 		fmt.Println("Error 1", err)
 		return
 	}
 	outputfile, err := os.Create(outputpath)
 	if err != nil {
 		fmt.Println("Error 2", err)
-		return 
+		return
 	}
 	scanner := bufio.NewScanner(inputfile)
 	writer := bufio.NewWriter(outputfile)
-	for scanner.Scan(){
-	line := scanner.Text()
-	result := processor.go(line)
-	writer := fmt.Println(result + "\n")
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		result := processor.Compiler(line)
+		writer.WriteString(result + "\n")
 	}
 	writer.Flush()
 }

@@ -1,4 +1,4 @@
-package main
+package processor
 
 import (
 	"strconv"
@@ -15,6 +15,23 @@ func Hextodec(s string) string {
 				input = append(input[:i], input[i+1:]...)
 				i--
 			}
+
+		}
+	}
+	return strings.Join(input, " ")
+}
+
+func Bintodec(s string) string {
+	input := strings.Fields(s)
+	for i := 0; i < len(input); i++ {
+		if input[i] == "(bin)" && i > 0 {
+			num, err := strconv.ParseInt(input[i-1], 2, 64)
+			if err == nil {
+				input[i-1] = strconv.FormatInt(num, 10)
+				input = append(input[:i], input[i+1:]...)
+				i--
+			}
+
 		}
 	}
 	return strings.Join(input, " ")
