@@ -1,6 +1,9 @@
 package main
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func TrimArtRows(rows []string) []string {
 
@@ -11,4 +14,21 @@ func TrimArtRows(rows []string) []string {
 	}
 
 	return result
+}
+func main() {
+	rows := []string{
+		// "  ##  ",
+		// " #  # ",
+		// " #  # ",
+		// " #  # ",
+		// " #  # ",
+		// " #  # ",
+		// " #  # ",
+		// "      ",
+		"hello ", "world "}
+	count := TrimArtRows(rows)
+	for _, v := range count {
+		fmt.Printf("%q", v)
+		fmt.Println()
+	}
 }
