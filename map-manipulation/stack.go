@@ -14,6 +14,13 @@ func StackTwo(top []string, bottom []string) []string {
 	sort.Strings(result)
 	return result
 }
+func StackAll(blocks [][]string)[]string{
+	result := []string{}
+	for _, block := range blocks{
+		result = StackTwo(result, block)
+	} 
+	return result
+}
 
 func main() {
 
