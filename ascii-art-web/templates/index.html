@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASCII Art Web Studio</title>
+    <style>
+        body { font-family: sans-serif; margin: 50px; background: #f9f9f9; }
+        textarea { width: 100%; max-width: 500px; height: 100px; font-size: 16px; }
+        select, button { padding: 10px; margin-top: 10px; font-size: 16px; display: block; }
+        /* This box keeps our spaces perfectly wide like a typewriter */
+        pre { background: #222; color: #00ffcc; padding: 20px; font-family: monospace; overflow-x: auto; font-size: 14px; }
+        .error { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>ASCII Art Web Generator</h1>
+
+    {{if .Error}}
+        <p class="error">{{.Error}}</p>
+    {{end}}
+
+    <form action="/ascii-art" method="POST">
+        <label>Type your text:</label>
+        <textarea name="text" required>{{.InputText}}</textarea>
+
+        <label>Select a Banner Style:</label>
+        <select name="banner">
+            <option value="standard" {{if eq .Banner "standard"}}selected{{end}}>Standard</option>
+            <option value="shadow" {{if eq .Banner "shadow"}}selected{{end}}>Shadow</option>
+            <option value="thinkertoy" {{if eq .Banner "thinkertoy"}}selected{{end}}>Thinkertoy</option>
+        </select>
+
+        <button type="submit">Generate Masterpiece</button>
+    </form>
+
+    {{if .Result}}
+        <h2>Output Art:</h2>
+        <pre>{{.Result}}</pre>
+    {{end}}
+
+</body>
+</html>
