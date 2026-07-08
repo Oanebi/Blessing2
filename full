@@ -1,0 +1,97 @@
+package main
+
+import (
+	"strings"
+)
+
+func Render(input string, banner map[rune][]string) string {
+	if input == "" {
+		return ""
+	}
+	if input == "\\n" {
+		return "\n"
+	}
+	var output strings.Builder
+	word := strings.Split(input, "\\n")
+
+	for _, words := range word {
+		// If the split segment is empty, it means there was a newline sequence
+		if words == "" {
+			output.WriteString("\n")
+			continue
+		}
+
+		// 'i' represents the line index of the banner character (usually 0 to 7 for an 8-line tall font)
+		// We assume a standard banner height of 8 lines here
+		for i := 0; i < 8; i++ {
+			for _, ch := range words {
+				// Access the specific line 'i' for character 'ch'
+				if lines, exists := banner[ch]; exists && i < len(lines) {
+					output.WriteString(lines[i])
+				}
+			}
+			output.WriteString("\n")
+		}
+	}
+
+	return output.String()
+}
+
+package main
+
+import (
+	"fmt"
+	"os"
+)
+
+func main() {
+	if len(os.Args) < 2 {
+		fmt.Println("error")
+		return
+	}
+	input := os.Args[1]
+
+	// 1. Declare the variable with a default value outside the block
+	bannerfile := "standard.txt"
+
+	// 2. Overwrite it using '=' if a second argument is provided
+	if len(os.Args) == 3 {
+		bannerfile = os.Args[2] + ".txt"
+	}
+
+	banner, err := Loadbanner(bannerfile)
+	if err != nil {
+		fmt.Println("err loading banner")
+		return
+	}
+	fmt.Print(Render(input, banner))
+}
+
+package main
+
+import (
+	"errors"
+	"os"
+	"strings"
+)
+
+func Loadbanner(file string) (map[rune][]string, error) {
+	graph := map[rune][]string{}
+
+	filename, err := os.ReadFile(file)
+	if err != nil {
+		return nil, errors.New("error reading file")
+	}
+	if len(filename) == 0 {
+		return nil, errors.New("empty fiile")
+	}
+	result := strings.Split(string(filename), "\n")
+	if len(result) != 856 {
+		return nil, errors.New("incomplete file")
+	}
+	for i := ' '; i <= '~'; i++ {
+		start := (i - ' ') * 9
+		graph[i] = result[start+1 : start+9]
+	}
+	return graph, nil
+}

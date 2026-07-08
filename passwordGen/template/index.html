@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Password Generator</title>
+</head>
+<header>
+    Password-Generator
+</header>
+<body>
+    <form method="post" action="/password" >
+        <input type="checkbox" name="numbers" placeholder="Enter a valid number">Numbers
+        <input type="checkbox" name="uppercase" placeholder="Enter uppercase alphabet">Uppercase Alphabet
+        <input type="checkbox" name="lowercase" placeholder="Enter lowercase alphabet">Lowercase Alphabet
+        <input type="checkbox" name="special" placeholder="Enter a special character">Special character
+        
+        <button name="Submit">Submit</button>
+<button type="button" onclick="copyPassword()">copy</button>
+    </form>
+<pre id="result"> {{.Result}}</pre>
+    <script>
+function copyPassword() {
+    let text = document.getElementById("result").innerText
+    navigator.clipboard.writeText(text)
+}
+</script>
+
+</body>
+
+</html>

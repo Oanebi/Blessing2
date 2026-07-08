@@ -1,0 +1,236 @@
+package main
+
+import (
+	"strings" // Imports the standard strings library for manipulation functions and Builders
+)
+
+// Declares the Render function with its parameters and specifies it returns a single formatted string
+func Render(s string, banner map[rune][]string, targetsubstring string, colorname string, alignMode string, reverseFlag bool) string {
+
+	// Guard clause: If the input text is completely empty, exit early with an empty string
+	if s == "" {
+		return ""
+	}
+
+	// Guard clause: If the literal input is just a newline token, return a real terminal newline
+	if s == "\\n" {
+		return "\n"
+	}
+
+	// --- 1. REVERSE LOGIC USING STRINGS.BUILDER ---
+	// Checks if the user enabled the reverse flag option
+	if reverseFlag {
+		// Declares a specialized strings.Builder to efficiently assemble the inverted main string
+		var revS strings.Builder
+
+		// Loops backward through the bytes of string 's', starting from the last index down to 0
+		for i := len(s) - 1; i >= 0; i-- {
+			// Writes the current byte directly into the string builder buffer
+			revS.WriteByte(s[i])
+		}
+		// Overwrites the original string 's' with the newly reversed string content
+		s = revS.String()
+
+		// Declares another strings.Builder to invert the target substring filter
+		var revSub strings.Builder
+
+		// Loops backward through the target substring bytes from the last index down to 0
+		for i := len(targetsubstring) - 1; i >= 0; i-- {
+			// Writes the substring byte into the target substring builder buffer
+			revSub.WriteByte(targetsubstring[i])
+		}
+		// Overwrites the target substring with its reversed counterpart so search matches align
+		targetsubstring = revSub.String()
+	}
+
+	// --- 2. CONFIGURING COLOR CODES ---
+	// Declares an empty string variable to hold our chosen terminal ANSI color code
+	var colorcode string
+
+	// Sets up the universal ANSI escape sequence to reset terminal text back to default white
+	resetcode := "\033[0m"
+
+	// Evaluates the provided colorname string to find a matching terminal ANSI configuration
+	switch colorname {
+	case "red":
+		colorcode = "\033[31m" // Assigns the escape sequence for foreground red text
+	case "green":
+		colorcode = "\033[32m" // Assigns the escape sequence for foreground green text
+	case "yellow":
+		colorcode = "\033[33m" // Assigns the escape sequence for foreground yellow text
+	case "brown":
+		colorcode = "\033[94m" // Assigns the escape sequence for foreground brown/light-blue text
+	case "orange":
+		colorcode = "\033[202m" // Assigns the escape sequence for an extended 8-bit orange color text
+	default:
+		colorcode = "" // If no valid color matches, leaves the color sequence blank
+		resetcode = "" // If no color is used, clears the reset sequence so no useless bytes print
+	}
+
+	// --- 3. MULTI-MATCH COLOR MAPPING MATRIX ---
+	// Allocates a boolean checklist slice of false values, matching the exact length of string 's'
+	shouldcolor := make([]bool, len(s))
+
+	// If the user did not supply a specific substring filter, color the entire phrase
+	if targetsubstring == "" {
+		// Loops through every index position of our boolean checklist slice
+		for i := range shouldcolor {
+			shouldcolor[i] = true // Marks every single character position as eligible for coloring
+		}
+	} else {
+		// Initializes an offset marker at index 0 to track our scanning progress through string 's'
+		searchStart := 0
+
+		// Initiates an infinite loop to look for every single instance of the target substring
+		for {
+			// Searches for the substring, scanning only the remaining unsearched portion of 's'
+			matchIdx := strings.Index(s[searchStart:], targetsubstring)
+
+			// If strings.Index returns -1, it means no more matches exist, so we exit the loop
+			if matchIdx == -1 {
+				break
+			}
+
+			// Calculates the true, absolute starting index relative to the original full string 's'
+			actualStart := searchStart + matchIdx
+
+			// Captures the total byte length of our target substring filter
+			length := len(targetsubstring)
+
+			// Loops through the exact index range occupied by this specific substring match
+			for i := actualStart; i < actualStart+length; i++ {
+				shouldcolor[i] = true // Flips the checklist position to true to color this character
+			}
+
+			// Advances our scanning fence past this match instance to avoid matching it again
+			searchStart = actualStart + length
+		}
+	}
+
+	// --- 4. LINE-BY-LINE ALIGNED RENDER ENGINE ---
+	// Declares the main strings.Builder canvas to compile our final ASCII art output string
+	var output strings.Builder
+
+	// Splits the main text string into a slice of individual lines using literal newlines as dividers
+	wordLines := strings.Split(s, "\\n")
+
+	// Initializes a global index tracker to map current line letters back to our 'shouldcolor' slice
+	lineStartGlobalIdx := 0
+
+	// Sets a standard baseline terminal width boundary margin of 80 columns
+	terminalWidth := 80
+
+	// Loops through each individual line segment generated by our newline split function
+	for _, words := range wordLines {
+
+		// If the current line segment is completely empty, it represents an intentional blank line
+		if words == "" {
+			output.WriteString("\n") // Writes a single clean line break to the main output canvas
+			lineStartGlobalIdx += 2  // Advances the global tracker past the 2 characters of the literal "\\n"
+			continue                 // Skips the remaining rendering logic and moves to the next line segment
+		}
+
+		// Initializes a counter to track the total graphical column width of our ASCII line
+		asciiWidth := 0
+
+		// Initializes a counter to track how many standard space characters exist in this line segment
+		spacesCount := 0
+
+		// Loops through each character in the current line segment to analyze its visual size
+		for _, ch := range words {
+			// If the character is a literal space, increment our space tracker counter
+			if ch == ' ' {
+				spacesCount++
+			}
+			// Queries our banner font asset map to see if visual asset data exists for this character
+			if line, ok := banner[ch]; ok {
+				asciiWidth += len(line[0]) // Adds the exact character slice block width to our total counter
+			}
+		}
+
+		// Loops exactly 8 times because every banner character is exactly 8 horizontal rows high
+		for i := 0; i < 8; i++ {
+			// Resets our local character map tracker back to the start position of this current line
+			currentGlobalIdx := lineStartGlobalIdx
+
+			// Handles Right Alignment: Adds empty padding spaces if requested and room is available
+			if alignMode == "right" && terminalWidth > asciiWidth {
+				output.WriteString(strings.Repeat(" ", terminalWidth-asciiWidth))
+				// Handles Center Alignment: Adds exactly half of the remaining empty room as padding spaces
+			} else if alignMode == "center" && terminalWidth > asciiWidth {
+				output.WriteString(strings.Repeat(" ", (terminalWidth-asciiWidth)/2))
+			}
+
+			// Handles Justify Alignment: Dynamically stretches individual space widths between words
+			if alignMode == "justify" && spacesCount > 0 && terminalWidth > asciiWidth {
+				// Calculates the total number of empty terminal columns left over on the right margin
+				totalSpacesNeeded := terminalWidth - asciiWidth
+
+				// Divides the extra room evenly among the existing word gaps to find the baseline space padding
+				baseSpacePadding := totalSpacesNeeded / spacesCount
+
+				// Calculates any remaining leftover spaces that couldn't be divided perfectly evenly
+				extraRemainderSpaces := totalSpacesNeeded % spacesCount
+
+				// Loops character-by-character across the line segment to draw the current row slice
+				for chIdx := 0; chIdx < len(words); chIdx++ {
+					// Extracts the current character byte and converts it into a workable rune type
+					ch := rune(words[chIdx])
+
+					// Retrieves the character visual block slices from our banner template map
+					if line, ok := banner[ch]; ok {
+						// Checks our absolute global checklist to see if this character should be colored
+						if shouldcolor[currentGlobalIdx] {
+							// Wraps row slice 'i' inside the color and reset codes, writing it to the canvas
+							output.WriteString(colorcode + line[i] + resetcode)
+						} else {
+							// Writes row slice 'i' of the character to the canvas completely unstyled
+							output.WriteString(line[i])
+						}
+					}
+
+					// Intercepts spaces to inflate their widths dynamically for justification formatting
+					if ch == ' ' {
+						// Initializes a local holding variable for an extra remainder padding block
+						extraSpace := 0
+						// If we still have remainder spaces left over, distribute one here
+						if extraRemainderSpaces > 0 {
+							extraSpace = 1         // Sets the extra padding block size to 1 space
+							extraRemainderSpaces-- // Decrements our remainder tracking bucket by 1
+						}
+						// Writes the complete inflated space padding block into our output canvas
+						output.WriteString(strings.Repeat(" ", baseSpacePadding+extraSpace))
+					}
+					// Increments our global position marker coordinate forward by 1 character index
+					currentGlobalIdx++
+				}
+			} else {
+				// Fallback rendering path: Executes normal drawing flows (Left, Center, Right layouts)
+				for chIdx := 0; chIdx < len(words); chIdx++ {
+					// Extracts the current character byte and converts it into a workable rune type
+					ch := rune(words[chIdx])
+
+					// Retrieves the character visual block slices from our banner template map
+					if line, ok := banner[ch]; ok {
+						// Checks our absolute global checklist to see if this character should be colored
+						if shouldcolor[currentGlobalIdx] {
+							// Wraps row slice 'i' inside the color and reset codes, writing it to the canvas
+							output.WriteString(colorcode + line[i] + resetcode)
+						} else {
+							// Writes row slice 'i' of the character to the canvas completely unstyled
+							output.WriteString(line[i])
+						}
+					}
+					// Increments our global position marker coordinate forward by 1 character index
+					currentGlobalIdx++
+				}
+			}
+			// Once one horizontal row sweep across all letters finishes, write a line break to go down
+			output.WriteString("\n")
+		}
+		// When all 8 rows of a line finish drawing, advance the global starter index past it and its newline
+		lineStartGlobalIdx += len(words) + 2
+	}
+	// Converts the accumulated strings.Builder memory buffers into a finalized string and returns it
+	return output.String()
+}

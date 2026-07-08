@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ascii-Web</title>
+</head>
+<body>
+    <form method="post" action="/ascii-art">
+    <input type="text" name="input" placeholder="Enter your text here">
+     <select name="Banners">
+        
+           <option value="standard.txt"> standard.txt</option>
+
+            <option value="shadow.txt" >shadow.txt</option>
+
+            <option value="thinkertoy.txt"> thinkertoy.txt</option>
+
+    </select>
+    <button type="Submit">Submit</button>
+    </form>
+    <a href="/ascii-switch?text={{.Text}}&banner=standard.txt">standard.txt</a>
+    <a href="/ascii-switch?text={{.Text}}&banner=shadow.txt">shadow.txt</a>
+    <a href="/ascii-switch?text={{.Text}}&banner=thinkertoy.txt">thinkertoy.txt</a>
+       <pre>{{.Result}}</pre>
+
+    
+    
+</body>
+</html>
